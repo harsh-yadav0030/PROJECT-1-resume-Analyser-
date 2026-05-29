@@ -1,7 +1,8 @@
 import { ApiError } from "../utils/ApiError.js";
-import {ApiResponse} from "../utils/ApiResponse.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import bcrypt from "bcryptjs";
-import jwt from "JsonWebToken";
+import jwt from "jsonwebtoken";
+
 import { User } from "../models/user.model.js";
 import BlacklistTokenModel from "../models/blacklist.model.js";
 
@@ -20,7 +21,7 @@ const registerUser = async (req, res) => {
     });
 
     if (isUserAlreadyExist) {
-        throw new ApiError(401, "User already exists");
+        throw new ApiError(409, "User already exists");
     }
 
     const hash = await bcrypt.hash(password, 10);
@@ -42,69 +43,84 @@ const registerUser = async (req, res) => {
         }
     );
 
-    res.cookie("token", token);
-
-    res.status(201).json({
-        message: "User registered successfully",
-        user: {
-            id: user._id,
-            username: user.username,
-            email: user.email,
-        },
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
     });
 
-
+    return res.status(201).json(
+        new ApiResponse(
+            201,
+            {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+            },
+            "User registered successfully"
+        )
+    );
 };
 
-const loginUser = async (req,res) => {
-  const {email,password}=req.body;
-  const user= await User.findOne({email});
-  if(!user){
-    throw new ApiError(400,"User Doesnot exist");
-  }
+const loginUser = async (req, res) => {
+    const { email, password } = req.body;
 
-  const isPasswordValid = await bcrypt.compare(password,user.password);
+    const user = await User.findOne({ email });
 
-  if(!isPasswordValid){
-    throw new ApiError(400,"Incorrect password");
-  }
+    if (!user) {
+        throw new ApiError(404, "User does not exist");
+    }
 
-  const token = jwt.sign(
+    const isPasswordValid = await bcrypt.compare(
+        password,
+        user.password
+    );
+
+    if (!isPasswordValid) {
+        throw new ApiError(401, "Incorrect password");
+    }
+
+    const token = jwt.sign(
         {
-            id: user._id,
+            _id: user._id,
             username: user.username,
         },
         process.env.JWT_SECRET,
         {
             expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
         }
-  );
+    );
 
-  res.cookie("token", token);
-  res.status(200)
-  .json({
-      message: "User loggedIn successfully",
-        user: {
-            id: user._id,
-            username: user.username,
-            email: user.email,
-        },
-  });
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
+    });
 
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+            },
+            "User logged in successfully"
+        )
+    );
 };
 
 const logoutUser = async (req, res) => {
     const token = req.cookies?.token;
-    console.log("Token to be blacklisted soon",token)
+
     if (token) {
         await BlacklistTokenModel.create({
-            token
+            token,
         });
     }
 
-
     res.clearCookie("token");
-    
+
     return res.status(200).json(
         new ApiResponse(
             200,
@@ -124,4 +140,9 @@ const getProfile = async (req, res) => {
     );
 };
 
-export { registerUser, loginUser ,logoutUser ,getProfile };
+export {
+    registerUser,
+    loginUser,
+    logoutUser,
+    getProfile,
+};

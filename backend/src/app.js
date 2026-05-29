@@ -18,4 +18,12 @@ import authRouter from "./routes/auth.routes.js";
 /*using all the routes here */
 app.use('/api/auth',authRouter);
 
+/* Error handling middleware */
+app.use((err, req, res, next) => {
+    return res.status(err.statusCode || 500).json({
+        success: false,
+        message: err.message || "Internal Server Error",
+    });
+});
+
 export default app;
