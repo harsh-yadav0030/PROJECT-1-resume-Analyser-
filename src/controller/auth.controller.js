@@ -33,7 +33,7 @@ const registerUser = async (req, res) => {
 
     const token = jwt.sign(
         {
-            id: user._id,
+            _id: user._id,
             username: user.username,
         },
         process.env.JWT_SECRET,
@@ -52,6 +52,8 @@ const registerUser = async (req, res) => {
             email: user.email,
         },
     });
+
+
 };
 
 const loginUser = async (req,res) => {
@@ -91,13 +93,35 @@ const loginUser = async (req,res) => {
 
 };
 
-const logoutUser=async()=>{
-    const token=req.cookies.token;
-    if(token){
-      await blacklistModel.create(token)
+const logoutUser = async (req, res) => {
+    const token = req.cookies?.token;
+    console.log("Token to be blacklisted soon",token)
+    if (token) {
+        await BlacklistTokenModel.create({
+            token
+        });
     }
-    res.clearCookie("token");
-    throw new ApiResponse
-}
 
-export { registerUser, loginUser,logoutUser };
+
+    res.clearCookie("token");
+    
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            {},
+            "User logged out successfully"
+        )
+    );
+};
+
+const getProfile = async (req, res) => {
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            req.user,
+            "Profile fetched successfully"
+        )
+    );
+};
+
+export { registerUser, loginUser ,logoutUser ,getProfile };
