@@ -12,7 +12,8 @@ const handleLogin = async ({email,password}) => {
     setLoading(true);
     const data = await login({email,password, });
     console.log(data);//browser console 
-    setUser(data.user);//set user 
+    console.log("data.data =", data.data);
+    setUser(data.data);//set user // my api response has data not user
   } catch (error) {
     console.log(error);
   } finally {
