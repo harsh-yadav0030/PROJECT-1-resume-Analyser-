@@ -1,7 +1,10 @@
 import express from "express";
 import cors from "cors"
 import cookieParser from "cookie-parser";
+import { invokeGeminiAI } from "./services/ai.service.js";
+
 const app=express();
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -22,6 +25,7 @@ import authRouter from "./routes/auth.routes.js";
 /*using all the routes here */
 app.use('/api/auth',authRouter);
 
+invokeGeminiAI();
 /* Error handling middleware */
 app.use((err, req, res, next) => {
     return res.status(err.statusCode || 500).json({

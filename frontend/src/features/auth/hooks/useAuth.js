@@ -1,5 +1,5 @@
  /* eslint-disable no-unused-vars */
-import { useContext } from "react";
+import { useContext ,useEffect} from "react";
 import { AuthContext } from "../auth.context";
 import {login  ,logout,profile, register} from "../services/auth.api";
 
@@ -32,5 +32,7 @@ const handleLogout= async()=>{
       setUser(null);
       setLoading(false);
   }
+
+
   return {user,loading,handleLogin,handleRegister,handleLogout};
 }
