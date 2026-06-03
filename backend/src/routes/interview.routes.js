@@ -1,6 +1,6 @@
 import {Router} from "express";
 import  {authMiddleware}  from "../middlewares/auth.middleware.js";
-import {generateInterViewReportController} from "../controller/interview.controller.js";
+import {generateInterviewReportController} from "../controller/interview.controller.js";
 const interviewRouter=new Router();
 
 /**
@@ -9,9 +9,7 @@ const interviewRouter=new Router();
  * @access Private
  */
 
-interviewRouter.post('/',authMiddleware,generateInterViewReportController);
-
-
+interviewRouter.post('/',authMiddleware,generateInterviewReportController);
 
 
 export default interviewRouter;

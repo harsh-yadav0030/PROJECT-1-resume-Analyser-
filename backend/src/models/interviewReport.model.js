@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { User } from "./user.model.js";
+
 /**
  * - Job description schema
  * - resume text
@@ -36,11 +38,12 @@ const technicalQuestionSchema = new mongoose.Schema(
   },
   {
     _id: false,
-  }
+  },
 );
 
-const behavioralQuestionSchema=new mongoose.Schema({
-   question: {
+const behavioralQuestionSchema = new mongoose.Schema(
+  {
+    question: {
       type: String,
       required: [true, "Technical question is required"],
     },
@@ -55,7 +58,8 @@ const behavioralQuestionSchema=new mongoose.Schema({
   },
   {
     _id: false,
-});
+  },
+);
 
 const skillGapSchema = new mongoose.Schema(
   {
@@ -72,7 +76,7 @@ const skillGapSchema = new mongoose.Schema(
   },
   {
     _id: false,
-  }
+  },
 );
 
 const preparationPlanSchema = new mongoose.Schema({
@@ -81,7 +85,8 @@ const preparationPlanSchema = new mongoose.Schema({
     required: [true, "Day is required"],
   },
 
-  focus: {// topic of that day
+  focus: {
+    // topic of that day
     type: String,
     required: [true, "Focus is required"],
   },
@@ -94,30 +99,41 @@ const preparationPlanSchema = new mongoose.Schema({
   ],
 });
 
-const interviewReportSchema=new mongoose.Schema({
-  jobDescription :{
-     type:String,
-     required:[true,"Job description required "]
+const interviewReportSchema = new mongoose.Schema(
+  {
+    jobDescription: {
+      type: String,
+      required: [true, "Job description required "],
+    },
+    resume: {
+      type: String,
+      required: [true, "Resume is required"],
+    },
+    selfDescription: {
+      type: String,
+    },
+    matchScore: {
+      type: Number,
+      min: 0,
+      max: 100,
+    },
+    technicalQuestion: [technicalQuestionSchema],
+    behavioralQuestion: [behavioralQuestionSchema],
+    skillGap: [skillGapSchema],
+    preparationPlan: [preparationPlanSchema],
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    },
   },
-  resume:{
-    type:String,
-    required:[true,"Resume is required"],
+  {
+    timestamps: true,
   },
-  selfDescription:{
-    type:String,
-  },
-  matchScore:{
-    type:Number,
-    min:0,
-    max:100,
-  },
-  technicalQuestion:[technicalQuestionSchema],
-  behavioralQuestion:[behavioralQuestionSchema],
-  skillGap:[skillGapSchema],
-  preparationPlan:[preparationPlanSchema]
-},{
-  timestamps:true
-})
+);
 
+const  interviewReportModel = mongoose.model(
+  "interviewReportModel",
+  interviewReportSchema,
+);
 
-export const interviewReport = new mongoose.model(interviewReport,"interviewReportSchema");
+export {interviewReportModel};
