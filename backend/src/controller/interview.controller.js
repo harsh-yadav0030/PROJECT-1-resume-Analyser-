@@ -1,14 +1,19 @@
-import { PDFParse } from 'pdf-parse';
+import * as pdfParse from "pdf-parse";
 import { generateInterviewReport } from "../services/ai.service.js";
 import {interviewReportModel} from "../models/interviewReport.model.js"
 
 const generateInterviewReportController = async (req, res) => {
-  const resumeFile = req.file;
+  console.log(req.file);
+console.log(req.body);
 
-  const pdfData = await pdfParse(resumeFile.buffer);
-  const resumeContent = pdfData.text;
+  const resumeContent = await (
+  new pdfParse.PDFParse(
+    Uint8Array.from(req.file.buffer)
+  )
+).getText();
 
   const { selfDescription, jobDescription } = req.body;
+
 
   const interviewReportByAi = await generateInterviewReport({
     resume: resumeContent,
@@ -16,7 +21,7 @@ const generateInterviewReportController = async (req, res) => {
     jobDescription,
   });
 
-  const interviewReportSchema = await interviewReportModel.create({
+  const interviewReport = await interviewReportModel.create({
       user:req.user.id,
       resume:resumeContent,
       selfDescription,
