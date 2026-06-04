@@ -49,11 +49,4 @@ const generateInterviewReport = async ({resume,selfDescription,jobDescription}) 
     return JSON.parse(response.text)
 };
 
-// async function invokeGeminiAI() {
-//   const response = await ai.models.generateContent({
-//     model: "gemini-2.5-flash",
-//     contents: "Hello Gemini : Explain What is Interview ?",
-//   });
-//   console.log(response.text);
-// }
 export {generateInterviewReport};
