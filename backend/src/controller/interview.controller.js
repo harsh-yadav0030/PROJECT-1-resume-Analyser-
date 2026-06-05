@@ -4,8 +4,6 @@ import {interviewReportModel} from "../models/interviewReport.model.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const generateInterviewReportController = async (req, res) => {
-  console.log(req.file);
-  console.log(req.body);
 
   const parsedPdf = await (
   new pdfParse.PDFParse(
@@ -22,7 +20,9 @@ const interviewReportByAi = await generateInterviewReport({
     jobDescription,
 });
 
+
 const user=req.user;
+console.log(interviewReportByAi);
 
 const interviewReport = await interviewReportModel.create({
       user:req.user.id,
@@ -32,9 +32,6 @@ const interviewReport = await interviewReportModel.create({
       ...interviewReportByAi
 })
 
-console.log(interviewReport);
-
-
 return res.status(200).json(
       new ApiResponse(
         200,
@@ -43,6 +40,7 @@ return res.status(200).json(
     )
   );
 };
+
 
 export { generateInterviewReportController };
 

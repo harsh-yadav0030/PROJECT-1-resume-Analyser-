@@ -1,13 +1,12 @@
-import { GoogleGenAI } from "@google/genai";
+import { ApiError, GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-
 import dotenv from "dotenv";
 dotenv.config();
 
 const ai = new GoogleGenAI({
-  apiKey: process.env.GOOGLE_GENAI_API_KEY,
-});
+    apiKey: process.env.GOOGLE_GENAI_API_KEY
+})
 
 const interviewReportSchema = z.object({
     matchScore: z.number().describe("A score between 0 and 100 indicating how well the candidate's profile matches the job describe"),
@@ -33,20 +32,108 @@ const interviewReportSchema = z.object({
     title: z.string().describe("The title of the job for which the interview report is generated"),
 })
 
-const generateInterviewReport = async ({resume,selfDescription,jobDescription}) => {
-  const prompt=`Generate an interview report for a candidate with the following details:
-                        Resume: ${resume}
-                        Self Description: ${selfDescription}
-                        Job Description: ${jobDescription}`
+async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
-    config:{
-        responseMimeType:"application/json",
-        responseSchema:zodToJsonSchema(interviewReportSchema),
-    }})
-    return JSON.parse(response.text)
-};
+    const prompt = `
+You are an expert interview preparation assistant.
 
-export {generateInterviewReport};
+Generate a COMPLETE interview report in STRICT JSON format.
+
+Return ONLY valid JSON.
+Do NOT wrap response in markdown.
+Do NOT add \`\`\`json.
+
+The JSON must follow this structure:
+
+{
+  "matchScore": number,
+  "technicalQuestions": [
+    {
+      "question": string,
+      "intention": string,
+      "answer": string
+    }
+  ],
+  "behavioralQuestions": [
+    {
+      "question": string,
+      "intention": string,
+      "answer": string
+    }
+  ],
+  "skillGaps": [
+    {
+      "skill": string,
+      "severity": "low" | "medium" | "high"
+    }
+  ],
+  "preparationPlan": [
+    {
+      "day": number,
+      "focus": string,
+      "tasks": [string]
+    }
+  ],
+  "title": string
+}
+
+RULES:
+- matchScore between 0 and 100
+- At least 5 technicalQuestions
+- At least 5 behavioralQuestions
+- At least 3 skillGaps
+- At least 5 preparationPlan days
+
+Candidate Resume:
+${resume || "Not Provided"}
+
+Candidate Self Description:
+${selfDescription || "Not Provided"}
+
+Job Description:
+${jobDescription}
+`
+
+try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt
+        })
+
+        let text = response.text
+
+        if (!text) {
+            throw new ApiError(401,"Empty AI response from gemini")
+        }
+        text = text.replace(/```json/g, "")
+        text = text.replace(/```/g, "")
+        text = text.trim()
+
+        const parsed = JSON.parse(text)
+
+        return {
+            matchScore: parsed.matchScore || 50,
+            technicalQuestions: parsed.technicalQuestions || [],
+            behavioralQuestions: parsed.behavioralQuestions || [],
+            skillGaps: parsed.skillGaps || [],
+            preparationPlan: parsed.preparationPlan || [],
+            title: parsed.title || jobDescription
+        }
+
+    } catch (error) {
+
+        console.log("AI PARSE ERROR:")
+        console.log(error)
+
+        return {
+            matchScore: 70,
+            technicalQuestions: [],
+            behavioralQuestions: [],
+            skillGaps: [],
+            preparationPlan: [],
+            title: jobDescription
+        }
+    }
+}
+
+export { generateInterviewReport };
