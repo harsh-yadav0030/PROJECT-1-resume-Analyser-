@@ -14,15 +14,24 @@ main {
   justify-content: center;
   align-items: center;
 
-  background: linear-gradient(
-    135deg,
-    #1a103d 0%,
-    #3b0764 50%,
-    #581c87 100%
+  background:
+  radial-gradient(
+    circle at right center,
+    rgba(88, 28, 135, 0.22),
+    transparent 50%
+  ),
+  linear-gradient(
+    180deg,
+    #050816 0%,
+    #0b1120 100%
   );
 
   font-family: Inter, sans-serif;
 }
+
+/* =========================
+   FORM CONTAINER
+========================= */
 
 .form-container {
   width: 100%;
@@ -36,10 +45,16 @@ main {
 
   color: white;
 
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
   box-shadow:
-    0 0 35px rgba(168, 85, 247, 0.15),
-    0 15px 30px rgba(0, 0, 0, 0.35);
+    0 15px 40px rgba(0, 0, 0, 0.35),
+    0 0 30px rgba(255, 45, 120, 0.08);
 }
+
+/* =========================
+   LOGO
+========================= */
 
 .logo-container {
   width: 48px;
@@ -55,14 +70,19 @@ main {
 
   background: linear-gradient(
     135deg,
-    #8b5cf6,
-    #c084fc
+    #ff2d78,
+    #ff005c
   );
 
   font-size: 1.2rem;
 
-  box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);
+  box-shadow:
+    0 0 18px rgba(255, 45, 120, 0.35);
 }
+
+/* =========================
+   TITLE
+========================= */
 
 .form-container h1 {
   text-align: center;
@@ -75,6 +95,10 @@ main {
   margin-bottom: 10px;
 }
 
+/* =========================
+   BADGE
+========================= */
+
 .badge {
   width: fit-content;
 
@@ -84,15 +108,19 @@ main {
 
   border-radius: 999px;
 
-  background: rgba(168, 85, 247, 0.15);
+  background: rgba(255, 45, 120, 0.12);
 
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  border: 1px solid rgba(255, 45, 120, 0.3);
 
-  color: #c084fc;
+  color: #ff2d78;
 
   font-size: 0.75rem;
   font-weight: 600;
 }
+
+/* =========================
+   SUBTITLE
+========================= */
 
 .subtitle {
   text-align: center;
@@ -105,6 +133,10 @@ main {
 
   margin-bottom: 1.8rem;
 }
+
+/* =========================
+   FORM
+========================= */
 
 form {
   width: 100%;
@@ -124,6 +156,10 @@ form {
   font-size: 0.9rem;
   font-weight: 500;
 }
+
+/* =========================
+   INPUTS
+========================= */
 
 .input-group input {
   width: 100%;
@@ -149,10 +185,15 @@ form {
 .input-group input:focus {
   outline: none;
 
-  border-color: #a855f7;
+  border-color: #ff2d78;
 
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+  box-shadow:
+    0 0 15px rgba(255, 45, 120, 0.25);
 }
+
+/* =========================
+   OPTIONS
+========================= */
 
 .options {
   margin: 8px 0 18px;
@@ -172,37 +213,53 @@ form {
   width: 15px;
   height: 15px;
 
-  accent-color: #a855f7;
+  accent-color: #ff2d78;
 }
 
-// .primary-button {
-//   width: 100%;
-//   height: 48px;
+/* =========================
+   BUTTON
+========================= */
 
-//   border: none;
-//   border-radius: 12px;
+.primary-button {
+  width: 100%;
+  height: 48px;
 
-//   background: linear-gradient(
-//     90deg,
-//     #8b5cf6,
-//     #d8a4ff
-//   );
+  border: none;
+  border-radius: 12px;
 
-//   color: white;
+  background: linear-gradient(
+    135deg,
+    #ff2d78,
+    #ff005c
+  );
 
-//   font-size: 1rem;
-//   font-weight: 700;
+  color: white;
 
-//   cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
 
-//   transition: all 0.3s ease;
-// }
+  cursor: pointer;
 
-// .primary-button:hover {
-//   transform: translateY(-2px);
+  transition: all 0.3s ease;
 
-//   box-shadow: 0 0 15px rgba(192, 132, 252, 0.35);
-// }
+  box-shadow:
+    0 8px 20px rgba(255, 0, 92, 0.25);
+}
+
+.primary-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 28px rgba(255, 0, 92, 0.45);
+}
+
+.primary-button:active {
+  transform: scale(0.98);
+}
+
+/* =========================
+   FOOTER
+========================= */
 
 .footer {
   margin-top: 1.5rem;
@@ -216,6 +273,11 @@ form {
 
   font-size: 0.8rem;
 }
+
+/* =========================
+   PASSWORD FIELD
+========================= */
+
 .password-wrapper {
   position: relative;
 }
@@ -228,7 +290,7 @@ form {
 
   transform: translateY(-50%);
 
-  color: #a855f7;
+  color: #ff2d78;
 
   font-size: 1rem;
 }
@@ -239,6 +301,11 @@ form {
   padding-left: 14px;
   padding-right: 50px;
 }
+
+/* =========================
+   TOGGLE PASSWORD
+========================= */
+
 .toggle-password {
   position: absolute;
 
@@ -260,9 +327,42 @@ form {
   align-items: center;
   justify-content: center;
 
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .toggle-password:hover {
-  color: #c084fc;
+  color: #ff2d78;
+}
+
+/* =========================
+   AUTH LINK
+========================= */
+
+.auth-link {
+  margin-top: 1rem;
+
+  text-align: center;
+
+  color: #9ca3af;
+
+  font-size: 0.9rem;
+}
+
+.auth-link a {
+  color: #ff2d78;
+
+  text-decoration: none;
+
+  font-weight: 700;
+
+  transition: all 0.3s ease;
+}
+
+.auth-link a:hover {
+  color: #ff5a96;
+
+  text-shadow:
+    0 0 10px rgba(255, 45, 120, 0.4);
+
+  text-decoration: none;
 }

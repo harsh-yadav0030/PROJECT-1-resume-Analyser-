@@ -6,9 +6,9 @@
   border-radius: 12px;
 
   background: linear-gradient(
-    90deg,
-    #8b5cf6,
-    #d8a4ff
+    180deg,
+    #ff2f7d 0%,
+    #ff005c 100%
   );
 
   color: white;
@@ -19,10 +19,20 @@
   cursor: pointer;
 
   transition: all 0.3s ease;
+
+  box-shadow:
+    0 8px 20px rgba(255, 0, 92, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .primary-button:hover {
   transform: translateY(-2px);
 
-  box-shadow: 0 0 15px rgba(192, 132, 252, 0.35);
+  box-shadow:
+    0 12px 28px rgba(255, 0, 92, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.primary-button:active {
+  transform: scale(0.98);
 }

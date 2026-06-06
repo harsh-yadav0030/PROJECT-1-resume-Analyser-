@@ -12,7 +12,8 @@
         ]
       }
     ],
-    "css-prefix-order": "off"
+    "css-prefix-order": "off",
+    "axe/forms": "off"
   },
   "browserslist": [
     "defaults",
