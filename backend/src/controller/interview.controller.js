@@ -30,10 +30,10 @@ const generateInterviewReportController = async (req, res) => {
   });
 
   return res
-    .status(200)
-    .json(
-      new ApiResponse(200, user, "Interview report generated successfully"),
-    );
+    .status(200).json({
+        message: "Interview report generated successfully.",
+        interviewReport
+    });
 };
 
 const getInterviewReportByIdController = async (req, res) => {

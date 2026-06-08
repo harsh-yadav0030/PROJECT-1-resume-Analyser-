@@ -1,13 +1,30 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import React, { useState ,useRef} from "react";
 import "../style/Home.scss";
 import { useNavigate } from "react-router";
+import { useInterview } from "../hooks/useInterview";
 
 const Home = () => {
+  const {loading,generateReport}=useInterview();
   const [jobDescription, setJobDescription] = useState("");
   const [selfDescription, setSelfDescription] = useState("");
+  const resumeInputRef=useRef();
 
   const navigate = useNavigate();
+
+  const handleGenerateReport = async () =>{
+      const resumeFile = resumeInputRef.current.files[0];
+      const data = await generateReport({ jobDescription, selfDescription, resumeFile });
+      console.log("data:", data);
+      navigate(`/interview/${data._id}`);
+  }
+    if (loading) {
+        return (
+            <main className='loading-screen'>
+                <h1>Loading your interview plan...</h1>
+            </main>
+        )
+    }
 
   return (
     <div className="home-page">
@@ -127,6 +144,7 @@ e.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScri
                 </p>
 
                 <input
+                ref={resumeInputRef}
                   hidden
                   type="file"
                   id="resume"
@@ -135,6 +153,7 @@ e.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScri
                 />
               </label>
             </div>
+
 
             {/* OR Divider */}
             <div className="or-divider">
@@ -179,7 +198,9 @@ e.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScri
             AI-Powered Strategy Generation • Approx 30s
           </span>
 
-          <button className="generate-btn">
+          <button className="generate-btn"
+          onClick={handleGenerateReport}>
+
             Generate My Interview Strategy
           </button>
         </div>

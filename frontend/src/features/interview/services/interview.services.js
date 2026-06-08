@@ -25,4 +25,14 @@ export const generateInterviewReportById = async (interviewId) => {
     const response = await api.get(`/api/interview/report/${interviewId}`);
     return response.data;
 }
+
+/**
+ * @description Service to get all interview reports of logged in user.
+ */
+
+export const getAllInterviewReports = async () => {
+    const response = await api.get("/api/interview/")
+
+    return response.data
+}
  
