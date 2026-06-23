@@ -1,6 +1,6 @@
 import {Router} from "express";
 import  {authMiddleware}  from "../middlewares/auth.middleware.js";
-import {generateInterviewReportController,getInterviewReportByIdController} from "../controller/interview.controller.js";
+import {generateInterviewReportController,getInterviewReportByIdController,generateResumePdfController} from "../controller/interview.controller.js";
 import {upload} from "../middlewares/file.middleware.js";
 
 const interviewRouter=new Router();
@@ -29,5 +29,12 @@ interviewRouter.get("/report/:interviewId",authMiddleware,getInterviewReportById
 
 interviewRouter.get('/', upload.single("resume"),authMiddleware,generateInterviewReportController);
 
+
+/**
+ * @route GET /api/interview/resume/pdf
+ * @description generate resume pdf on the basis of user self description, resume content and job description.
+ * @access private
+ */
+interviewRouter.post("/resume/pdf/:interviewReportId", authMiddleware,generateResumePdfController)
 
 export default interviewRouter;
