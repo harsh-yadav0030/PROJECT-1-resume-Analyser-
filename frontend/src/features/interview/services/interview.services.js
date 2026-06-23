@@ -1,5 +1,4 @@
- 
-import axios from "axios";
+ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:3000",
@@ -25,7 +24,6 @@ export const generateInterviewReportById = async (interviewId) => {
     const response = await api.get(`/api/interview/report/${interviewId}`);
     return response.data;
 }
-
 /**
  * @description Service to get all interview reports of logged in user.
  */

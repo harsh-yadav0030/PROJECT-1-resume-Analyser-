@@ -1,8 +1,9 @@
  /* eslint-disable no-unused-vars */
-import { useContext } from "react";
+import { generateInterviewReport, generateInterviewReportById ,getAllInterviewReports} from "../services/interview.services";
+import { useContext,useEffect } from "react";
 import { useParams } from "react-router";
 import { InterviewContext } from "../interview.context";
-import { generateInterviewReport, generateInterviewReportById ,getAllInterviewReports} from "../services/interview.services";
+
 
 export const useInterview = () => {
    const context = useContext(InterviewContext);
@@ -16,7 +17,7 @@ export const useInterview = () => {
 
         const generateReport = async ({ jobDescription, selfDescription, resumeFile }) => {
         setLoading(true)
-        let response = null
+         let response = null
         try {
             response = await generateInterviewReport({ jobDescription, selfDescription, resumeFile })
             setReport(response.interviewReport)
@@ -25,8 +26,7 @@ export const useInterview = () => {
           } finally {
             setLoading(false)
           }
-
-          console.log("response =", response);
+        //   console.log("response =", response);
           return response.interviewReport
         }
 

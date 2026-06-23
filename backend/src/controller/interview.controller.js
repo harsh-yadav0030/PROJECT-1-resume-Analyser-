@@ -1,5 +1,5 @@
 import * as pdfParse from "pdf-parse";
-import { generateInterviewReport } from "../services/ai.service.js";
+import { generateInterviewReport ,generateResumePdf } from "../services/ai.service.js";
 import { interviewReportModel } from "../models/interviewReport.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -60,5 +60,7 @@ const getAllInterviewReportsController = async ( req , res ) => {
         interviewReports
     })
 }
+
+const generateResumePdfCon
 
 export { generateInterviewReportController,getInterviewReportByIdController, getAllInterviewReportsController};

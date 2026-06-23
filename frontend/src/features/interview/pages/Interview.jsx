@@ -174,9 +174,9 @@ const Interview = () => {
             ))}
           </div>
           <button
-            onClick={() => {
-              getResumePdf(interviewId);
-            }}
+            // onClick={() => {
+            //   // getResumePdf(interviewId);
+            // }}
             className="button primary-button"
           >
             <svg
