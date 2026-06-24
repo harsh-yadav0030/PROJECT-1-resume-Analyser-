@@ -1,12 +1,8 @@
 /* eslint-disable no-useless-assignment */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-undef */
-/* eslint-disable no-unused-vars */
-import {
-  generateInterviewReport,
-  generateInterviewReportById,
-  getAllInterviewReports,
-} from "../services/interview.services";
+ 
+import { generateInterviewReport,generateInterviewReportById,getAllInterviewReports,} from "../services/interview.services";
 import { useContext, useEffect } from "react";
 import { useParams } from "react-router";
 import { InterviewContext } from "../interview.context";
@@ -22,59 +18,38 @@ export const useInterview = () => {
   const { loading, setLoading, report, setReport, reports, setReports } =
     context;
 
-  const generateReport = async ({
-    jobDescription,
-    selfDescription,
-    resumeFile,
-  }) => {
+  const generateReport = async ({jobDescription,selfDescription,resumeFile,}) => {
     setLoading(true);
     let response = null;
     try {
-      response = await generateInterviewReport({
-        jobDescription,
-        selfDescription,
-        resumeFile,
-      });
+      response = await generateInterviewReport({jobDescription,selfDescription,resumeFile,});
       setReport(response.interviewReport);
-    } catch (error) {
+      return response.interviewReport;
+    } 
+    catch (error) {
       console.log(error);
-    } finally {
+    }
+     finally {
       setLoading(false);
     }
     //   console.log("response =", response);
-    return response.interviewReport;
+    
   };
 
   const getReportById = async (interviewId) => {
     setLoading(true);
-    let response = null;
     try {
-      response = await generateInterviewReportById(interviewId);
+      const response = await generateInterviewReportById(interviewId);
       setReport(response.interviewReport);
-    } catch (error) {
+      return response.interviewReport;
+    }
+     catch (error) {
       console.log(error);
-    } finally {
+      return null;
+    }
+     finally {
       setLoading(false);
     }
-    return response.interviewReport;
-  };
-
-  const generateReports = async ({
-    jobDescription,
-    selfDescription,
-    resumeFile,
-  }) => {
-    setLoading(true);
-    let response = null;
-    try {
-      response = await generateInterviewReportById(interviewId);
-      setReport(response.interviewReport);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-    return response.interviewReport;
   };
 
   const getReports = async () => {
@@ -85,6 +60,7 @@ export const useInterview = () => {
       setReports(response.interviewReports);
     } catch (error) {
       console.log(error);
+      return [];
     } finally {
       setLoading(false);
     }
@@ -95,18 +71,26 @@ export const useInterview = () => {
     setLoading(true);
     let response = null;
     try {
-      response = await generateResumePdf({ interviewReportId });
+      response = await generateResumePdf({ interviewReportId});
       const url = window.URL.createObjectURL(
         new Blob([response], { type: "application/pdf" }),
       );
+
       const link = document.createElement("a");
+
       link.href = url;
+
       link.setAttribute("download", `resume_${interviewReportId}.pdf`);
+
       document.body.appendChild(link);
+
       link.click();
-    } catch (error) {
+      link.remove();
+    } 
+    catch (error) {
       console.log(error);
-    } finally {
+    }
+    finally {
       setLoading(false);
     }
   };

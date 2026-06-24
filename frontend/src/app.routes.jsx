@@ -10,11 +10,13 @@ export const router=createBrowserRouter([{
     path:"/login",
     element:<Login/>
 },
+
 {
     path:"/register",
     element:<Register/>
-},{
-    path:"/",
+},
+{
+    path:"/", //checking if login or not
     element:<Protected>
        <Home/>
     </Protected>
