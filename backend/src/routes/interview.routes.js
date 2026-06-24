@@ -1,6 +1,6 @@
 import {Router} from "express";
 import  {authMiddleware}  from "../middlewares/auth.middleware.js";
-import {generateInterviewReportController,getInterviewReportByIdController,generateResumePdfController} from "../controller/interview.controller.js";
+import {generateInterviewReportController,getInterviewReportByIdController,generateResumePdfController,getAllInterviewReportsController} from "../controller/interview.controller.js";
 import {upload} from "../middlewares/file.middleware.js";
 
 const interviewRouter=new Router();
@@ -27,7 +27,7 @@ interviewRouter.get("/report/:interviewId",authMiddleware,getInterviewReportById
  * @access Private
  */
 
-interviewRouter.get('/', upload.single("resume"),authMiddleware,generateInterviewReportController);
+interviewRouter.get("/", authMiddleware,getAllInterviewReportsController)
 
 
 /**
