@@ -1,8 +1,7 @@
 /* eslint-disable no-useless-assignment */
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-undef */
  
-import { generateInterviewReport,generateInterviewReportById,getAllInterviewReports,} from "../services/interview.services";
+import { generateInterviewReport,generateInterviewReportById,getAllInterviewReports,generateResumePdf} from "../services/interview.services";
 import { useContext, useEffect } from "react";
 import { useParams } from "react-router";
 import { InterviewContext } from "../interview.context";
