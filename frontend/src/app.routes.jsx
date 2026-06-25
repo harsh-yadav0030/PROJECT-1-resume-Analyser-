@@ -16,7 +16,7 @@ export const router=createBrowserRouter([{
     element:<Register/>
 },
 {
-    path:"/", //checking if login or not
+    path:"/", //checking if login ora not
     element:<Protected>
        <Home/>
     </Protected>

@@ -1,12 +1,5 @@
 import { Router } from "express";
-
-import {
-  registerUser,
-  loginUser,
-  logoutUser,
-  getProfile,
-} from "../controller/auth.controller.js";
-
+import {registerUser,loginUser,logoutUser,getProfile,refreshAccessToken} from "../controller/auth.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 const authRouter = Router();
@@ -27,10 +20,10 @@ authRouter.post("/login", loginUser);
 
 /**
  * @route POST /api/auth/logout
- * @description clear token from user cookie and add the token in blacklist
- * @access public
+ * @description Clear access & refresh token cookies and invalidate the refresh token
+ * @access private
  */
-authRouter.post("/logout", logoutUser);
+authRouter.post("/logout", authMiddleware,logoutUser);
 
 /**
  * @route GET /api/auth/profile
@@ -38,5 +31,12 @@ authRouter.post("/logout", logoutUser);
  * @access private
  */
 authRouter.get("/profile", authMiddleware, getProfile);
+
+/**
+ * @route POST /api/auth/refresh-token
+ * @description Verify refresh token and issue new access & refresh tokens
+ * @access public
+ */
+authRouter.post("/refresh-token", refreshAccessToken);
 
 export default authRouter;

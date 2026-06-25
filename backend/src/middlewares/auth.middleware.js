@@ -1,45 +1,39 @@
 import jwt from "jsonwebtoken";
-import BlacklistTokenModel from "../models/blacklist.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-const authMiddleware = async (req, res, next) => {
-    const token = req.cookies?.token;
+const authMiddleware = asyncHandler(async (req, res, next) => {
+    // Access token can come from cookies or Authorization header
+    const token =
+        req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-        throw new ApiError(401, "Invalid token");
+        throw new ApiError(401, "Unauthorized request");
     }
 
-    const blacklisted = await BlacklistTokenModel.findOne({
-        token,
-    });
-
-    if (blacklisted) {
-        throw new ApiError(401, "Token blacklisted");
-    }
+    let decodedToken;
 
     try {
-        const decoded = jwt.verify(
+        decodedToken = jwt.verify(
             token,
-            process.env.JWT_SECRET
+            process.env.ACCESS_TOKEN_SECRET
         );
 
-        const user = await User.findById(decoded._id)
-            .select("-password");
+    const user = await User.findById(decodedToken._id)
+        .select("-password -refreshToken");
 
-        if (!user) {
-            throw new ApiError(404, "User not found");
-        }
-
-        req.user = user;
-
-        return next();
-    } catch (error) {
-        throw new ApiError(
-            401,
-            "Invalid or expired token"
-        );
+    if (!user) {
+        throw new ApiError(404, "User not found");
     }
-};
+
+    req.user = user;
+
+    next();
+
+    } catch (error) {
+        throw new ApiError(401, "error in auth middleware");
+    } 
+});
 
 export { authMiddleware };

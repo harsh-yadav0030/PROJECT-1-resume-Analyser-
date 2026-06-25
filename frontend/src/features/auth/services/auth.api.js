@@ -1,8 +1,5 @@
-import axios from "axios";
-const api = axios.create({
-  baseURL: "http://localhost:3000",
-  withCredentials: true,
-});
+import api from "../../services/axios";
+
 export async function register({ username, email, password }) {
   try {
     const response = await api.post("/api/auth/register", {
@@ -43,6 +40,17 @@ export async function profile() {
     return response.data;
   } catch (err) {
     console.log(err);
+    throw err;
+  }
+};
+
+export async function refreshAccessToken(){
+  try {
+    const response = await api.post("/api/auth/refresh-token");
+    return response.data;
+  } catch (err) {
+    console.log(err);
+    throw err;
   }
 }
 

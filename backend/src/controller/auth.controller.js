@@ -2,11 +2,38 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
 import { User } from "../models/user.model.js";
-import BlacklistTokenModel from "../models/blacklist.model.js";
+import {asyncHandler} from "../utils/asynchandler.js"
+import dotenv from "dotenv";
 
-const registerUser = async (req, res) => {
+dotenv.config();
+
+// console.log("ACCESS_TOKEN_EXPIRY:", process.env.ACCESS_TOKEN_EXPIRY);
+// console.log("REFRESH_TOKEN_EXPIRY:", process.env.REFRESH_TOKEN_EXPIRY);
+
+const generateAccessAndRefreshTokens = async (userId) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+
+    user.refreshToken = refreshToken;
+
+    await user.save({
+        validateBeforeSave: false,
+    });
+
+    return {
+        accessToken,
+        refreshToken,
+    };
+};
+
+const registerUser = asyncHandler (async (req, res) => {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
@@ -60,9 +87,9 @@ const registerUser = async (req, res) => {
             "User registered successfully"
         )
     );
-};
+});
 
-const loginUser = async (req, res) => {
+const loginUser = asyncHandler (async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -80,57 +107,64 @@ const loginUser = async (req, res) => {
         throw new ApiError(401, "Incorrect password");
     }
 
-    const token = jwt.sign(
-        {
-            _id: user._id,
-            username: user.username,
-        },
-        process.env.JWT_SECRET,
-        {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-        }
-    );
+    const {accessToken,refreshToken}=await generateAccessAndRefreshTokens(user._id);
 
-    res.cookie("token", token, {
+    const options = {
         httpOnly: true,
-        secure: false,
-        maxAge: 24 * 60 * 60 * 1000,
-    });
+        secure: process.env.NODE_ENV === "production",//developmenet phase we want it false;
+        sameSite: "strict", // Prevents cookies from being sent with cross-site requests (helps protect against CSRF). 
+        };
 
-    return res.status(200).json(
-        new ApiResponse(
-            200,
-            {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-            },
-            "User logged in successfully"
-        )
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    id: user._id,
+                    username: user.username,
+                    email: user.email,
+                },
+                "User logged in successfully"
+            )
     );
-};
+});
 
-const logoutUser = async (req, res) => {
-    const token = req.cookies?.token;
+const logoutUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
 
-    if (token) {
-        await BlacklistTokenModel.create({
-            token,
-        });
+    if (!user) {
+        throw new ApiError(404, "User not found");
     }
 
-    res.clearCookie("token");
+    user.refreshToken = null;
 
-    return res.status(200).json(
-        new ApiResponse(
-            200,
-            {},
-            "User logged out successfully"
-        )
-    );
-};
+    await user.save({
+        validateBeforeSave: false,
+    });
 
-const getProfile = async (req, res) => {
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    };
+
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "User logged out successfully"
+            )
+        );
+});
+
+const getProfile = asyncHandler(async (req, res) => {
     return res.status(200).json(
         new ApiResponse(
             200,
@@ -138,11 +172,73 @@ const getProfile = async (req, res) => {
             "Profile fetched successfully"
         )
     );
-};
+});
+
+
+// token comes and check token
+// verify token by decoding 
+// fetch user using id in token
+// verify the refresh TOken 
+//generate new refresh TOken
+
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    const token = req.cookies?.refreshToken;
+
+    if (!token) {
+        throw new ApiError(401, "Unauthorized request");
+    }
+
+    let decodedToken;
+
+    try {
+        decodedToken = jwt.verify(
+            token,
+            process.env.REFRESH_TOKEN_SECRET
+        );
+    } catch (error) {
+        throw new ApiError(401, "Invalid or expired refresh token");
+    }
+
+    const user = await User.findById(decodedToken._id);
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    if (token !== user.refreshToken) {
+        throw new ApiError(401, "Invalid or expired refresh token");
+    }
+
+    const { accessToken, refreshToken } =
+        await generateAccessAndRefreshTokens(user._id);
+
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    };
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    id: user._id,
+                    username: user.username,
+                    email: user.email,
+                },
+                "Access token refreshed successfully"
+            )
+        );
+});
 
 export {
     registerUser,
     loginUser,
     logoutUser,
     getProfile,
+    refreshAccessToken
 };
