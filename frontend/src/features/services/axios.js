@@ -6,26 +6,40 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
+
   async (error) => {
+
     const originalRequest = error.config;
-    // to stop from infinte loop of refresh request if backend dont refresh properly
-    if (error.response?.status === 401 && !originalRequest._retry) {
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry
+    ) {
+
       originalRequest._retry = true;
 
       if (originalRequest.url === "/api/auth/refresh-token") {
         return Promise.reject(error);
       }
 
-      await api.post("/api/auth/refresh-token");
+      try {
 
-      return api(originalRequest);
+        await api.post("/api/auth/refresh-token");
+
+        return api(originalRequest);
+
+      } catch (refreshError) {
+
+        return Promise.reject(refreshError);
+
+      }
+
     }
 
     return Promise.reject(error);
-  },
+
+  }
 );
 
 export default api;

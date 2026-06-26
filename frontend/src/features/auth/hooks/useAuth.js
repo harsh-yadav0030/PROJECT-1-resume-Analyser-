@@ -23,6 +23,7 @@ const handleLogin = async ({email,password}) => {
 
 const handleRegister = async ({username,email,password}) => {
   const data = await register({username,email, password});
+  console.log("Returned from register:", data);
   setUser(data.data);
 };
    

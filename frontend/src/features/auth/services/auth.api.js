@@ -7,7 +7,10 @@ export async function register({ username, email, password }) {
       email,
       password,
     });
+    console.log("Response:", response);
+    console.log("Response data:", response.data);
     return response.data;
+
   } catch (err) {
     console.log(err);
   }

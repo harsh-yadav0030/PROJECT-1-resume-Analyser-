@@ -9,7 +9,6 @@ import { useAuth } from "../hooks/useAuth";
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { loading, handleRegister } = useAuth();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -21,7 +20,7 @@ const Register = () => {
 
   try {
     await handleRegister({username, email,password});
-    navigate("/");
+    navigate("/login");
   }
    catch (error) {
     console.log(error);
@@ -40,15 +39,11 @@ const Register = () => {
     <main>
       <div className="form-container">
         <div className="logo-container">✨</div>
-
         <h1>ResumeAI</h1>
-
         <div className="badge">AI-Powered Analysis</div>
-
         <p className="subtitle">
           Sign Up to analyze and optimize your resume with AI
         </p>
-
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="username">Username</label>

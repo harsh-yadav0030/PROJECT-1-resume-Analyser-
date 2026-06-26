@@ -59,23 +59,6 @@ const registerUser = asyncHandler (async (req, res) => {
         password: hash,
     });
 
-    const token = jwt.sign(
-        {
-            _id: user._id,
-            username: user.username,
-        },
-        process.env.JWT_SECRET,
-        {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-        }
-    );
-
-    res.cookie("token", token, {
-        httpOnly: true,
-        secure: false,
-        maxAge: 24 * 60 * 60 * 1000,
-    });
-
     return res.status(201).json(
         new ApiResponse(
             201,
