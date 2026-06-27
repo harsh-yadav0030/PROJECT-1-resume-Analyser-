@@ -95,7 +95,7 @@ const loginUser = asyncHandler (async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",//developmenet phase we want it false;
-        sameSite: "strict", // Prevents cookies from being sent with cross-site requests (helps protect against CSRF). 
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Prevents cookies from being sent with cross-site requests (helps protect against CSRF). 
         };
 
     return res
@@ -131,7 +131,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Prevents cookies from being sent with cross-site requests (helps protect against CSRF). 
     };
 
     return res
@@ -198,7 +198,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Prevents cookies from being sent with cross-site requests (helps protect against CSRF). 
     };
 
     return res
