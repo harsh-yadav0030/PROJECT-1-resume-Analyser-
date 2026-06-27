@@ -2,7 +2,8 @@ import { ApiError, GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import dotenv from "dotenv";
-import puppeteer from 'puppeteer';
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 
 dotenv.config();
 
@@ -139,7 +140,12 @@ try {
 }
 
 async function generatePdfFromHtml(htmlContent) {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+  args: chromium.args,
+  defaultViewport: chromium.defaultViewport,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless,
+});
   const page = await browser.newPage();
   await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
