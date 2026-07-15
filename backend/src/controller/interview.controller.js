@@ -2,40 +2,46 @@ import * as pdfParse from "pdf-parse";
 import {generateInterviewReport,generateResumePdf} from "../services/ai.service.js";
 import { interviewReportModel } from "../models/interviewReport.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import { anonymizeResume } from "../services/privacy.service.js";
 
 const generateInterviewReportController = async (req, res) => {
   let resumeContent = "";
-  if(req.file){
-     const parsedPdf = await new pdfParse.PDFParse(
-    Uint8Array.from(req.file.buffer),
-  ).getText();
-      resumeContent = parsedPdf.text;
+
+  if (req.file) {
+    const parsedPdf = await new pdfParse.PDFParse(
+      Uint8Array.from(req.file.buffer)
+    ).getText();
+
+    resumeContent = parsedPdf.text;
   }
 
   const { selfDescription, jobDescription } = req.body;
 
-const interviewReportByAi = await generateInterviewReport({
-  resume: resumeContent,
-  selfDescription,
-  jobDescription,
-});
+  // Anonymize resume before sending it to Gemini
+  const privacyResult = anonymizeResume(resumeContent);
 
-const interviewReport = await interviewReportModel.create({
-  user: req.user.id,
-  resume: resumeContent,
-  selfDescription,
-  jobDescription,
-  ...interviewReportByAi,
-});
+  const interviewReportByAi = await generateInterviewReport({
+    resume: privacyResult.sanitizedText,
+    selfDescription,
+    jobDescription,
+  });
 
-const user = req.user;
-user.reportGenerationCount++;
-await user.save();
+  // Store the original resume in the database
+  const interviewReport = await interviewReportModel.create({
+    user: req.user.id,
+    resume: privacyResult.originalText,
+    selfDescription,
+    jobDescription,
+    ...interviewReportByAi,
+  });
 
-return res.status(200).json({
-  message: "Interview report generated successfully.",
-  interviewReport,
-});
+  req.user.reportGenerationCount++;
+  await req.user.save();
+
+  return res.status(200).json({
+    message: "Interview report generated successfully.",
+    interviewReport,
+  });
 };
 
 const getInterviewReportByIdController = async (req, res) => {
